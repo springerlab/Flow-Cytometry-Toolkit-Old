@@ -1,0 +1,170 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Flow Cytometry Gating Demo</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-03"><meta name="DC.source" content="gatingdemo.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Flow Cytometry Gating Demo</h1><!--introduction--><p>This file shows how to filter flow cytometry data by defining gates in 2 dimensions. It uses functions UIGETGATE and APPLYGATE, which are part of the Springer Lab Flow Cytometry Toolbox.</p><p>Created 20120703 JW</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Load and prepare the data</a></li><li><a href="#2">Define first gate</a></li><li><a href="#3">UIGETGATE returns a struct</a></li><li><a href="#4">The returned gate object can be applied on the unthinned data</a></li><li><a href="#5">Define another gate, this time on mCherry versus BFP</a></li><li><a href="#6">Filtered data</a></li></ul></div><h2>Load and prepare the data<a name="1"></a></h2><pre class="codeinput">load(<span class="string">'data/data_onetube.mat'</span>);  <span class="comment">% originally FCS 3.0 from Stratedigm</span>
+size(data)
+
+<span class="comment">% Thin the data for display</span>
+thindata = datasample(data,100000,1);
+size(thindata)
+</pre><pre class="codeoutput">
+ans =
+
+      760992          32
+
+
+ans =
+
+      100000          32
+
+</pre><h2>Define first gate<a name="2"></a></h2><pre class="codeinput"><span class="comment">% Prepare figure</span>
+figure
+subplot(1,2,1)
+
+<span class="comment">% Prompt user to draw vertices of a polygon on a scatterplot of FSC versus</span>
+<span class="comment">% SSC</span>
+gate1 = uigetgate(thindata,[2 4]);
+xlabel(<span class="string">'FSC'</span>)
+ylabel(<span class="string">'SSC'</span>)
+</pre><pre class="codeoutput">Select gate.
+</pre><img vspace="5" hspace="5" src="gatingdemo_01.png" alt=""> <h2>UIGETGATE returns a struct<a name="3"></a></h2><pre class="codeinput">gate1
+</pre><pre class="codeoutput">
+gate1 = 
+
+     coords: [11x2 double]
+    chanidx: [2 4]
+     scalex: @(x)x
+     scaley: @(x)x
+
+</pre><h2>The returned gate object can be applied on the unthinned data<a name="4"></a></h2><pre class="codeinput">newdata = applygate(data, gate1);
+size(newdata)
+</pre><pre class="codeoutput">
+ans =
+
+      572978          32
+
+</pre><h2>Define another gate, this time on mCherry versus BFP<a name="5"></a></h2><pre class="codeinput">subplot(1,2,2)
+
+<span class="comment">% Use log-log axes</span>
+gate2 = uigetgate(datasample(newdata,100000,1),[29 15],<span class="string">'log'</span>);
+xlabel(<span class="string">'log10(mCherry)'</span>)
+ylabel(<span class="string">'log10(BFP)'</span>)
+</pre><pre class="codeoutput">Select gate.
+</pre><img vspace="5" hspace="5" src="gatingdemo_02.png" alt=""> <h2>Filtered data<a name="6"></a></h2><pre class="codeinput">newdata = applygate(newdata, gate2);
+size(newdata)
+</pre><pre class="codeoutput">
+ans =
+
+      246860          32
+
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Flow Cytometry Gating Demo
+% This file shows how to filter flow cytometry data by defining gates in 2
+% dimensions. It uses functions UIGETGATE and APPLYGATE, which are part of
+% the Springer Lab Flow Cytometry Toolbox.
+%
+% Created 20120703 JW
+
+%% Load and prepare the data
+load('data/data_onetube.mat');  % originally FCS 3.0 from Stratedigm
+size(data)
+
+% Thin the data for display
+thindata = datasample(data,100000,1);
+size(thindata)
+
+%% Define first gate
+
+% Prepare figure
+figure
+subplot(1,2,1)
+
+% Prompt user to draw vertices of a polygon on a scatterplot of FSC versus
+% SSC
+gate1 = uigetgate(thindata,[2 4]);
+xlabel('FSC')
+ylabel('SSC')
+
+%% UIGETGATE returns a struct
+gate1
+
+%% The returned gate object can be applied on the unthinned data
+newdata = applygate(data, gate1);
+size(newdata)
+
+%% Define another gate, this time on mCherry versus BFP
+subplot(1,2,2)
+
+% Use log-log axes
+gate2 = uigetgate(datasample(newdata,100000,1),[29 15],'log');   
+xlabel('log10(mCherry)')
+ylabel('log10(BFP)')
+
+%% Filtered data
+newdata = applygate(newdata, gate2);
+size(newdata)
+##### SOURCE END #####
+--></body></html>
