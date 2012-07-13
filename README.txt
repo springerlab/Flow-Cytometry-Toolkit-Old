@@ -1,0 +1,10 @@
+Flow Cytometry Toolkit
+README
+
+Created 20120706 Jue Wang
+
+This set of .m files contains MATLAB code for processing flow cytometry data, written by Bo and Jue. More documentation will be added soon.
+
+FILES:
+
+data/	contains some example data that is used for the demo scripts.
