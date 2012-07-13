@@ -8,3 +8,6 @@ This set of .m files contains MATLAB code for processing flow cytometry data, wr
 FILES:
 
 data/	contains some example data that is used for the demo scripts.
+
+20120713
+BH downloaded the whole 'toolkit' package
