@@ -167,4 +167,4 @@ data
 html
 *.asv
 *.mat
-jue_scratch
+script/jue_scratch.m
