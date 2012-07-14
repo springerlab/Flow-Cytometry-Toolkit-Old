@@ -25,20 +25,17 @@ fprintf([strjoin(expr_meta.para, '\n','index', 'on'),'\n']);
 
 %% Visualization
 
-
-%% valid only above
-
 %% Filter
 % Data display - Single Well
 
 close all
 
 % specify all the parameters here
-plate = 1;
-row = 4;
-col = 1;
-cha1 = 'fsc';
-cha2 = 'ssc';
+plate = 4;
+row = 6;
+col = 10;
+cha1 = 'cfp';
+cha2 = 'mch';
 
 % data extraction
 data_well = all_data.data{plate}{row, col};
@@ -55,12 +52,19 @@ ylabel('SSC')
 
 % gating
 data_well_thin_sel = applygate(data_well, gate1);
-data_well_thin_sel_thin =  fc_thin(data_well_thin_sel, 1000);
-data_well_thin_sel_thin_mat  = [log10(data_well_thin_sel_thin .(cha1)), log10(data_well_thin_sel_thin .(cha2))];
+% data_well_thin_sel_thin =  fc_thin(data_well_thin_sel, 1000);
+data_well_thin_sel_thin = data_well_thin_sel;
+data_plot  = [log10(data_well_thin_sel_thin .(cha1)), log10(data_well_thin_sel_thin .(cha2))];
 
 % second plot
 subplot(1,2,2)
-plot(data_well_thin_sel_thin_mat(:,1), data_well_thin_sel_thin_mat(:,2), '.')
+plot(data_plot(:,1), data_plot(:,2), '.')
+xlabel(cha1)
+ylabel(cha2)
+
+
+
+%% valid only above
 
 %% Data display - Single Well
 
