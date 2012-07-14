@@ -3,7 +3,9 @@ function [datastruct metadata]= fcsparse(filename, paramstokeep)
 % (single-well) data files.
 %
 %   Created 2012/07/12 JW
-%
+%   Modified 20120714 BH, include expr_name in metadata for both LSRII and
+%       Stratedigm, update well_id extraction for LSRII. Still need to work
+%       on tube data for both machine
 
 % read data
 [data,paramVals,textHeader] = fcsread(filename);
@@ -69,6 +71,7 @@ if strcmp(cytometer,'LSRII')
     % LSRII-specific metadata
     metadata.plate_name = find(strcmp('PLATE NAME',{textHeader{:,1}}));
 
+<<<<<<< HEAD
 %     % this works but isn't useful
 %     plate_id_idx = find(strcmp('PLATE ID',{textHeader{:,1}}));
 %     if ~isempty(plate_id_idx)
@@ -96,7 +99,40 @@ else
         metadata.col = str2num(well_id(2:end));
         metadata.well_id = well_id;
     end
+=======
+% well position
+well_id_idx_strat = find(strcmp('WELL_ID',{textHeader{:,1}}));
+well_id_idx_LSR = find(strcmp('WELL ID',{textHeader{:,1}}));
+
+well_id_idx = [];
+
+if ~isempty(well_id_idx_strat)
+    well_id_idx = well_id_idx_strat;
+elseif ~isempty(well_id_idx_LSR)
+    well_id_idx = well_id_idx_LSR;
 end
+
+if ~isempty(well_id_idx)
+    well_id = textHeader{well_id_idx,2};
+    metadata.row = well_id(1)-'A'+1;
+    metadata.col = str2num(well_id(2:end));
+    metadata.well_id = well_id;
+>>>>>>> fcsfolderread done
+end
+
+% expr_name
+idx_expr_strat = find(strcmp('EXPERIMENT_NAME',{textHeader{:,1}}));
+idx_expr_LSR = find(strcmp('EXPERIMENT NAME',{textHeader{:,1}}));
+
+if ~isempty(idx_expr_LSR)
+    idx_expr = idx_expr_LSR;
+elseif ~isempty(idx_expr_strat)
+    idx_expr = idx_expr_strat;
+else
+    error('no expr id identified')
+end
+
+metadata.expr_name = textHeader{idx_expr, 2};
 
 % helper functions
 function datastruct = grab_specific_params(data, pnamelist, paramstokeep)

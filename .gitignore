@@ -168,3 +168,6 @@ html
 *.asv
 *.mat
 script/jue_scratch.m
+html
+# Added by Bo
+data_b050
