@@ -1,6 +1,6 @@
 function gatearray = uigetgate(data, paramnames, scaling)
 % Created 2012/07/02 JW
-% Updated 2012/07/13 JW
+% Updated 2012/07/13 BH, updated fontsize of text display
 if nargin<3
     scaling = 'lin';
 end
@@ -45,7 +45,7 @@ count = sum(idx);
 percent = count./fc_numel(data).*100;
 str = {num2str(count); sprintf('%4.2f%%',percent)};
 text(xc,yc,str,'horizontalalignment','center',...
-    'verticalalignment','middle','fontweight','bold');
+    'verticalalignment','middle','fontweight','bold', 'Fontsize', Fontsize_cal(gca,10));
 
 
 function [scalex scaley] = parsescaling(scaling)

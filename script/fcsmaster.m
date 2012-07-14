@@ -23,11 +23,45 @@ disp(' ')
 disp('Parameter index:')
 fprintf([strjoin(expr_meta.para, '\n','index', 'on'),'\n']);
 
+%% Visualization
+
+
 %% valid only above
 
 %% Filter
+% Data display - Single Well
 
-% to be finished
+close all
+
+% specify all the parameters here
+plate = 1;
+row = 4;
+col = 1;
+cha1 = 'fsc';
+cha2 = 'ssc';
+
+% data extraction
+data_well = all_data.data{plate}{row, col};
+data_well_thin = fc_thin(data_well,1000);
+
+% define first gate
+figure
+subplot(1,2,1)
+
+% Prompt user to draw a gate on a scatterplot of FSC versus SSC
+gate1 = uigetgate(data_well_thin,{'fsc','ssc'}, 'log');
+xlabel('FSC')
+ylabel('SSC')
+
+% gating
+data_well_thin_sel = applygate(data_well, gate1);
+data_well_thin_sel_thin =  fc_thin(data_well_thin_sel, 1000);
+data_well_thin_sel_thin_mat  = [log10(data_well_thin_sel_thin .(cha1)), log10(data_well_thin_sel_thin .(cha2))];
+
+% second plot
+subplot(1,2,2)
+plot(data_well_thin_sel_thin_mat(:,1), data_well_thin_sel_thin_mat(:,2), '.')
+
 %% Data display - Single Well
 
 close all
