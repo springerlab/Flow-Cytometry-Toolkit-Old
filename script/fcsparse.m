@@ -71,7 +71,6 @@ if strcmp(cytometer,'LSRII')
     % LSRII-specific metadata
     metadata.plate_name = find(strcmp('PLATE NAME',{textHeader{:,1}}));
 
-<<<<<<< HEAD
 %     % this works but isn't useful
 %     plate_id_idx = find(strcmp('PLATE ID',{textHeader{:,1}}));
 %     if ~isempty(plate_id_idx)
@@ -99,25 +98,7 @@ else
         metadata.col = str2num(well_id(2:end));
         metadata.well_id = well_id;
     end
-=======
-% well position
-well_id_idx_strat = find(strcmp('WELL_ID',{textHeader{:,1}}));
-well_id_idx_LSR = find(strcmp('WELL ID',{textHeader{:,1}}));
 
-well_id_idx = [];
-
-if ~isempty(well_id_idx_strat)
-    well_id_idx = well_id_idx_strat;
-elseif ~isempty(well_id_idx_LSR)
-    well_id_idx = well_id_idx_LSR;
-end
-
-if ~isempty(well_id_idx)
-    well_id = textHeader{well_id_idx,2};
-    metadata.row = well_id(1)-'A'+1;
-    metadata.col = str2num(well_id(2:end));
-    metadata.well_id = well_id;
->>>>>>> fcsfolderread done
 end
 
 % expr_name
