@@ -165,3 +165,6 @@ pip-log.txt
 # Added by Jue
 data
 html
+*.asv
+*.mat
+jue_scratch

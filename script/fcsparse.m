@@ -5,10 +5,14 @@ function [datastruct metadata]= fcsparse(filename, paramstokeep)
 %   Created 2012/07/12 JW
 %
 
-% Stratedigm file
+% read data
 [data,paramVals,textHeader] = fcsread(filename);
 
+% which instrument?
+cytometer = textHeader{find(strcmp('$CYT',{textHeader{:,1}})),2};
+
 % process data for each parameter (i.e. fluorescence channel)
+% works on both stratedigm and lsrii except where noted
 datastruct = struct;
 pnamelist = {paramVals.Name};
 
@@ -25,11 +29,11 @@ if ischar(paramstokeep)
             datastruct.(parname) = data(:,c);
         end
     elseif strcmp(paramstokeep,'common')    
-        % grab only common channels and rename them
+        % grab only common channels and rename them (STRATEDIGM ONLY)
         datastruct = grab_specific_params(data, pnamelist, pstrat([],0));
         
     elseif strcmp(paramstokeep,'rename')
-        % grab all channels but rename common ones
+        % grab all channels but rename common ones (STRATEDIGM ONLY)
         nameconversions = pstrat([],1); % param names -> nicknames
         for c=1:length(pnamelist)
             parname = underscorify(pnamelist{c});
@@ -52,25 +56,46 @@ end
 
 % process metadata
 metadata = struct;
+metadata.cytometer = cytometer;
 
-plate_id_idx = find(strcmp('PLATE_ID',{textHeader{:,1}}));
-if ~isempty(plate_id_idx)
-    metadata.plate_id = textHeader{plate_id_idx,2};
-end
-
+% metadata common to stratedigm and LSRII
+% works on both - verified 2012/07/14 JW
 Date = textHeader{find(strcmp('$DATE',{textHeader{:,1}})),2};
 BTim = textHeader{find(strcmp('$BTIM',{textHeader{:,1}})),2};
 BTim_tmp = regexp(BTim, '^(\d{2}:\d{2}:\d{2})', 'tokens');
 metadata.begin_time = datenum([Date, ' ', BTim_tmp{1}{1}]);
 
+if strcmp(cytometer,'LSRII')
+    % LSRII-specific metadata
+    metadata.plate_name = find(strcmp('PLATE NAME',{textHeader{:,1}}));
 
-% well position
-well_id_idx = find(strcmp('WELL_ID',{textHeader{:,1}}));
-if ~isempty(well_id_idx)
-    well_id = textHeader{well_id_idx,2};
-    metadata.row = well_id(1)-'A'+1;
-    metadata.col = str2num(well_id(2:end));
-    metadata.well_id = well_id;
+%     % this works but isn't useful
+%     plate_id_idx = find(strcmp('PLATE ID',{textHeader{:,1}}));
+%     if ~isempty(plate_id_idx)
+%         metadata.plate_id = textHeader{plate_id_idx,2};
+%     end
+
+    well_id_idx = find(strcmp('WELL ID',{textHeader{:,1}}));
+    if ~isempty(well_id_idx)
+        well_id = textHeader{well_id_idx,2};
+        metadata.row = well_id(1)-'A'+1;
+        metadata.col = str2num(well_id(2:end));
+        metadata.well_id = well_id;
+    end
+else
+    % stratedigm-specific metadata
+    plate_id_idx = find(strcmp('PLATE_ID',{textHeader{:,1}}));
+    if ~isempty(plate_id_idx)
+        metadata.plate_id = textHeader{plate_id_idx,2};
+    end
+
+    well_id_idx = find(strcmp('WELL_ID',{textHeader{:,1}}));
+    if ~isempty(well_id_idx)
+        well_id = textHeader{well_id_idx,2};
+        metadata.row = well_id(1)-'A'+1;
+        metadata.col = str2num(well_id(2:end));
+        metadata.well_id = well_id;
+    end
 end
 
 % helper functions
