@@ -1,8 +1,9 @@
 function paramstruct = plsrii(paramstoconvert,reverse)
-% PSTRAT translates parameter (channel) names on the Stratedigm into
+% PLSRII translates parameter (channel) names on the LSR into
 % easier-to-type nicknames
 %
-%   2012/07/12 JW
+%   2012/07/14  BH
+
 paramnames = { 'FSC-H';'FSC-A';...
     'SSC-H';'SSC-A';...
     'FITC-H';'FITC-A';...
