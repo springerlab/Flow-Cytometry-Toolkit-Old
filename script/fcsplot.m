@@ -1,4 +1,4 @@
-function [data] = fcsplot( data, channel, scaling)
+function fcsplot( data, channel, scaling)
 %fcsplot PLOT FCS SINGLE WELL DATA
 %   fcsplot( data ) plot fsc and ssc channels
 %   fcsplot( data, channel ) plot specific channels
@@ -19,6 +19,8 @@ elseif strcmp(scaling, 'log10')
     scafunc = @(x) log10(x);
 elseif strcmp(scaling, 'log2')
     scafunc = @(x) log2(x);
+elseif strcmp(scaling, 'log')
+    scafunc = @(x) log10(x);
 else
     scafunc = @(x) x;
 end
@@ -35,8 +37,8 @@ else
     plot3(data_x, data_y, data_z, '.', 'markersize', 1);
 end
 
-xlabel([channel{1}, '\_', scaling], 'fontsize', Fontsize_cal)
-ylabel([channel{2}, '\_', scaling], 'fontsize', Fontsize_cal)
+% xlabel([channel{1}, '\_', scaling], 'fontsize', Fontsize_cal)
+% ylabel([channel{2}, '\_', scaling], 'fontsize', Fontsize_cal)
 
 if length(channel) == 3
     zlabel([channel{3}, '\_', scaling])

@@ -1,4 +1,4 @@
-function gatearray = uigetgate(data, paramnames, scaling)
+function [gatearray, idx] = uigetgate(data, paramnames, scaling)
 % Created 2012/07/02 JW
 % Updated 2012/07/13 BH, updated fontsize of text display
 if nargin<3

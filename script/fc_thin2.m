@@ -25,7 +25,12 @@ if num <= 1
 end
 
 % pull out a specific number of events
-idx = randperm(n,num);
+
+if n>num
+    idx = randperm(n,num);
+else
+    idx = 1:n;
+end
 
 % filter each channel
 for c = 1:length(fns)
