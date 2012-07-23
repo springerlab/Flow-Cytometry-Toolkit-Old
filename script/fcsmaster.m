@@ -10,8 +10,9 @@ close all
 %% Load data
 
 foldername = '../data_b050';
-% Read data
-pstrat_common = pstrat({'t', 'ssc', 'fsc', 'bfp', 'cfp', 'yfp', 'mch'})
+% Read data, either way is fine,
+% pstrat_common = pstrat({'t', 'ssc', 'fsc', 'bfp', 'cfp', 'yfp', 'mch'})
+pstrat_common = pstrat({}); % default, four colors, fsc, ssc, t
 [all_data, expr_meta] = fcsfolderread(foldername, pstrat_common);
 
 % Report
@@ -31,15 +32,19 @@ fprintf([strjoin(expr_meta.para, '\n','index', 'on'),'\n']);
 close all
 
 % specify all the parameters here
+%
 plate = 4;
-row = 6;
-col = 10;
+row = 2;
+col = 1;
+
 cha1 = 'cfp';
-cha2 = 'mch';
+cha2 = 'ssc';
+
+close all
 
 % data extraction
 data_well = all_data.data{plate}{row, col};
-data_well_thin = fc_thin(data_well,1000);
+data_well_thin = fc_thin2(data_well,1);
 
 % define first gate
 figure
@@ -58,7 +63,7 @@ data_plot  = [log10(data_well_thin_sel_thin .(cha1)), log10(data_well_thin_sel_t
 
 % second plot
 subplot(1,2,2)
-plot(data_plot(:,1), data_plot(:,2), '.')
+fcsplot(data_well_thin_sel_thin, {cha1, cha2, 'ssc'}, 'log2')
 xlabel(cha1)
 ylabel(cha2)
 
@@ -66,11 +71,12 @@ ylabel(cha2)
 
 close all
 
-cha1 = 'cfp';
+cha1 = 'yfp';
 cha2 = 'mch';
+p = 5;
 
 figure('name', ['p', num2str(p), '_', cha1, '_', cha2])
-p = 3;
+
 
 data_plate = all_data.data{p};
 
@@ -84,13 +90,13 @@ for r = 1:8
             axes(h(12*r+c-12))
             
             data_well = fc_thin2( data_plate{r,c}, 1000);
-            fcsplot(data_well, {cha1, cha2}, 'log2')
+            fcsplot(data_well, {cha1, cha2}, 'log2', 0)
         end
     end
 end
 
-unifyaxis(gcf, 'xlim', [3 13])
-unifyaxis(gcf, 'ylim', [3 13])
+unifyaxis(gcf, 'xlim', [0 15])
+unifyaxis(gcf, 'ylim', [4 13])
 
 %% valid only above
 

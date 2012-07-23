@@ -1,4 +1,4 @@
-function fcsplot( data, channel, scaling, xylabel)
+function fcsscatter( data, channel, scaling)
 %fcsplot PLOT FCS SINGLE WELL DATA
 %   fcsplot( data ) plot fsc and ssc channels
 %   fcsplot( data, channel ) plot specific channels
@@ -10,10 +10,6 @@ if nargin == 1
     scaling = 'lin';
 elseif nargin == 2
     scaling = 'lin';
-end
-
-if nargin < 4
-    xylabel = 1;
 end
 
 % define scale
@@ -41,10 +37,8 @@ else
     plot3(data_x, data_y, data_z, '.', 'markersize', 1);
 end
 
-if xylabel
-    xlabel([channel{1}, '\_', scaling], 'fontsize', Fontsize_cal)
-    ylabel([channel{2}, '\_', scaling], 'fontsize', Fontsize_cal)
-end
+% xlabel([channel{1}, '\_', scaling], 'fontsize', Fontsize_cal)
+% ylabel([channel{2}, '\_', scaling], 'fontsize', Fontsize_cal)
 
 if length(channel) == 3
     zlabel([channel{3}, '\_', scaling])
