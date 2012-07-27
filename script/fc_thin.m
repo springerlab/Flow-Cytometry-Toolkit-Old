@@ -7,22 +7,29 @@ function thindata = fc_thin(data,num)
 %   events, if NUM >= 1, or a fraction of the events in DATA, if NUM < 1.
 %
 %   Created 2012/7/13 by JW
+%   Modified 20120714 BH
 
 if exist('num')~=1
     % default
-    num = 50000;
+    num = 1000;
 end
 
 fns = fieldnames(data)';
-n = length(data.(fns{1}));
+n = length(data.(fns{1})); % size
 
-if num < 1
+if num <= 1
     % pull out a fraction of the data (approx)
-    k = 10./num;
-    idx = 1:k:n;
-else
-    % pull out a specific number of events
+    num = floor(num*n);
+    %     k = 10./num;
+    %     idx = 1:k:n;
+end
+
+% pull out a specific number of events
+
+if n>num
     idx = randperm(n,num);
+else
+    idx = 1:n;
 end
 
 % filter each channel

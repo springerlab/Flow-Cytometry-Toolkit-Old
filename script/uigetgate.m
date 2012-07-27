@@ -1,6 +1,14 @@
 function [gatearray, idx] = uigetgate(data, paramnames, scaling)
-% Created 2012/07/02 JW
-% Updated 2012/07/13 BH, updated fontsize of text display
+%UIGETGATE
+%
+%   UIGETGATE(DATA, PARAMNAMES) scatterplots flow cytometry data along two
+%   given dimensions and prompts the user to draw polygons corresponding to
+%   gates on the data. The function returns the coordinates of the gates in
+%   a struct that can be used by the function APPLYGATE to filter data.
+% 
+%   Created 2012/07/02 JW
+%   Updated 2012/07/13 BH, updated fontsize of text display
+%   Updated 2012/07/27 JW, can input multiple gates
 if nargin<3
     scaling = 'lin';
 end
@@ -11,7 +19,6 @@ cla
 gatearray = struct;
 
 % prompt for gates
-% TODO: allow input of multiple gates
 
 % plot all data
 gateArray = {};
@@ -20,32 +27,47 @@ ydata = data.(paramnames{2});
 plot(scalex(xdata),scaley(ydata),'.','markersize',1);
 hold all;
 
-% user draws polygon
-fprintf('Select gate.\n');  %TODO: display this text on plot
-[x,y]=ginput();
-x=[x; x(1)];
-y=[y; y(1)];
-gatearray(1).coords = [x y];
-gatearray(1).paramnames = paramnames;
-gatearray(1).scalex = scalex;
-gatearray(1).scaley = scaley;
+fprintf(['Select a gate by clicking its vertices, and then hitting\n'...
+    '[Enter]. You can select more than one gate. To exit, hit [Enter]\n'...
+    'without clicking any points.\n']);  
 
-% draw polygon boundaries
-axis manual
-plot(x,y,'k','linewidth',2);
+k = 1;
+while 1
+    % user draws polygon
+    [x,y]=ginput();
+    
+    % stop prompting
+    if isempty(x)
+        break;
+    end
+    
+    % store this polygon as a gate
+    x=[x; x(1)];
+    y=[y; y(1)];
+    gatearray(k).coords = [x y];
+    gatearray(k).paramnames = paramnames;
+    gatearray(k).scalex = scalex;
+    gatearray(k).scaley = scaley;
 
-% plot data within polygon in different color
-idx = inpolygon(scalex(xdata),scaley(ydata), x,y);
-plot(scalex(xdata(idx)),scaley(ydata(idx)),'.','markersize',1);
+    % draw polygon boundaries
+    axis manual
+    plot(x,y,'k','linewidth',2);
 
-% show count and percent
-xc = mean(x(1:end-1));
-yc = mean(y(1:end-1));
-count = sum(idx);
-percent = count./fc_numel(data).*100;
-str = {num2str(count); sprintf('%4.2f%%',percent)};
-text(xc,yc,str,'horizontalalignment','center',...
-    'verticalalignment','middle','fontweight','bold', 'Fontsize', Fontsize_cal(gca,10));
+    % plot data within polygon in different color
+    idx = inpolygon(scalex(xdata),scaley(ydata), x,y);
+    plot(scalex(xdata(idx)),scaley(ydata(idx)),'.','markersize',1);
+
+    % show count and percent
+    xc = mean(x(1:end-1));
+    yc = mean(y(1:end-1));
+    count = sum(idx);
+    percent = count./fc_numel(data).*100;
+    str = {num2str(count); sprintf('%4.2f%%',percent)};
+    text(xc,yc,str,'horizontalalignment','center',...
+        'verticalalignment','middle','fontweight','bold', 'Fontsize', Fontsize_cal(gca,10));
+    
+    k = k+1;
+end 
 
 
 function [scalex scaley] = parsescaling(scaling)

@@ -2,12 +2,12 @@
 % This file shows how to use the functions in the Flow Cytometry Toolkit.
 %
 % Created 20120703 JW
-% Updated 2012/7/13 JW
+% Updated 2012/7/27 JW
 
 %% Load and prepare the data
 % This section shows how to use the FCSPARSE and FC_FOLDERREAD functions to
 % load data for analysis
-data = fcsparse('data/stratedigm/Sample 001_Tube 16_001.fcs','common')
+data = fcsparse('../data/stratedigm/Sample 001_Tube 16_001.fcs','common')
 
 %% GATING
 % This section shows how to filter flow cytometry data by defining gates in
@@ -39,5 +39,20 @@ gate2 = uigetgate(fc_thin(newdata,100000),{'mch','bfp'},'log');
 xlabel('log10(mCherry)')
 ylabel('log10(BFP)')
 
-%% Filtered data
-newdata = applygate(newdata, gate2)
+%% Gated data
+gateddata = applygate(newdata, gate2)
+
+%% Define both gates at the same time
+figure
+
+% This time draw a gate for BFP cells, then draw one for mCherry cells, and
+% hit enter twice.
+gateArray = uigetgate(fc_thin(newdata,100000),{'mch','bfp'},'log');
+xlabel('log10(mCherry)')
+ylabel('log10(BFP)')
+
+%% Struct array containing 2 gates
+gateArray
+
+%% Applying an array of gates yields a struct array of data
+dataArray = applygate(newdata, gateArray)
