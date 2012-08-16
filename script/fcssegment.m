@@ -19,18 +19,21 @@ makeplot = p.Results.makeplot;
 showlegend = p.Results.showlegend;
 debug = p.Results.debug;
 
-nrepeats = 10;
 if length(chans)<3
     chans{3} = 'ssc';
 end
+
+currfig = gcf;
+
+% algorithm parameters
+nrepeats = 10;
 
 trueidx = {};
 for c=1:2
     xdata = log10(data.(chans{c}));
     ydata = log10(data.(chans{3}));
 
-    allcen1 = [];
-    allcen2 = [];
+    icv = [];
     allidx = {};
     
     % debug - remove when everything is perfect
@@ -45,26 +48,22 @@ for c=1:2
         idx = cluster(gm,[xdata ydata]);
         idx1 = (idx == 1);
         idx2 = (idx == 2);
-
-        % cluster centroids -- used for determining outliers
-        cen1 = [mean(xdata(idx1)) mean(ydata(idx1))];
-        cen2 = [mean(xdata(idx2)) mean(ydata(idx2))];
+        m1 = mean(xdata(idx1));
+        m2 = mean(xdata(idx2));
 
         % ensure that cluster 2 always has higher mean
-        if cen1(1) > cen2(1)
+        if m1 > m2
             tmp = idx1;
             idx1 = idx2;
             idx2 = tmp;
-            allcen1(k,:) = cen2;
-            allcen2(k,:) = cen1;
-
-        else
-            allcen1(k,:) = cen1;
-            allcen2(k,:) = cen2;
         end
         allidx{k,1} = idx1;
         allidx{k,2} = idx2;
         
+        % intraclass variance - for rejecting bad clusterings
+        icv(k) = (sum(idx1).*var(xdata(idx1)) + sum(idx2).*var(xdata(idx2)))...
+                    ./length(xdata);
+               
         % debug - remove when everything is perfect
         if debug
             subplot(subplotsize{:},k)
@@ -74,14 +73,11 @@ for c=1:2
         end
     end
 
-    % remove outliers
-    z1 = zscorefloat(allcen1);
-    z2 = zscorefloat(allcen2);
-    zbad = any(abs([z1 z2])>1,2);
-    allidx(zbad,:) = [];
+    % use clustering with lowest intraclass variance
+    [~,minidx] = min(icv);
 
-    trueidx{c,1} = allidx{1,1};
-    trueidx{c,2} = allidx{1,2};
+    trueidx{c,1} = allidx{minidx,1};
+    trueidx{c,2} = allidx{minidx,2};
 end
 
 % intersect clusters
@@ -91,7 +87,8 @@ doublet = trueidx{1,2} & trueidx{2,2};
 debris = trueidx{1,1} & trueidx{2,1};
 
 % show segmentation
-if makeplot && ~debug
+if makeplot
+    figure(currfig);
     xdata = log10(data.(chans{1}));
     ydata = log10(data.(chans{2}));
     plot(xdata(singlet1),ydata(singlet1),'.')
