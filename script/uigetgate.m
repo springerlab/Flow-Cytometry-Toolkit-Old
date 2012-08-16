@@ -61,10 +61,10 @@ while 1
     xc = mean(x(1:end-1));
     yc = mean(y(1:end-1));
     count = sum(idx);
-    percent = count./fc_numel(data).*100;
+    percent = count./fcsnumel(data).*100;
     str = {num2str(count); sprintf('%4.2f%%',percent)};
     text(xc,yc,str,'horizontalalignment','center',...
-        'verticalalignment','middle','fontweight','bold', 'Fontsize', Fontsize_cal(gca,10));
+        'verticalalignment','middle','fontweight','bold', 'Fontsize', Fontsize_cal(gca,20));
     
     k = k+1;
 end 

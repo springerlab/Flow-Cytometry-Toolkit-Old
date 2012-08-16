@@ -1,3 +1,3 @@
-function out = fc_numel(data)
+function out = fcsnumel(data)
 fn = fieldnames(data);
 out = numel(data.(fn{1}));

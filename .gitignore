@@ -167,7 +167,7 @@ data
 html
 *.asv
 *.mat
-script/jue_scratch.m
+script/scratch
 html
 # Added by Bo
 data_b050

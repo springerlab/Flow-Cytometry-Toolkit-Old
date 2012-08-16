@@ -8,9 +8,19 @@ function outstr = underscorify(str,leadingnum)
 %   starts with a number, the letter 'x' is appended to the beginning of
 %   the string.
 %
-%   2012/07/12
+%   Created 20120712 JW
+%   Updated 20120814 to condense multiple _'s to a single _.
 outstr = str;
 outstr(~isstrprop(str,'alphanum')) = '_';
+
+[idx1 idx2] = regexp(outstr, '_+');
+toremove = [];
+for c=1:length(idx1)
+    toremove = [toremove idx1(c)+1:idx2(c)];
+end
+
+outstr(toremove)=[];
+
 if exist('leadingnum')==1
     if isstrprop(outstr(1),'digit')
         outstr = ['x' outstr];
