@@ -24,7 +24,7 @@ gatearray = struct;
 gateArray = {};
 xdata = data.(paramnames{1});
 ydata = data.(paramnames{2});
-plot(scalex(xdata),scaley(ydata),'.','markersize',1);
+plot(scalex(xdata),scaley(ydata),'.','markersize',3);
 hold all;
 
 fprintf(['Select a gate by clicking its vertices, and then hitting\n'...
@@ -55,7 +55,7 @@ while 1
 
     % plot data within polygon in different color
     idx = inpolygon(scalex(xdata),scaley(ydata), x,y);
-    plot(scalex(xdata(idx)),scaley(ydata(idx)),'.','markersize',1);
+    plot(scalex(xdata(idx)),scaley(ydata(idx)),'.','markersize',3);
 
     % show count and percent
     xc = mean(x(1:end-1));
