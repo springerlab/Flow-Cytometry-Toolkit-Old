@@ -6,12 +6,18 @@ function [datastruct metadata]= fcsparse(filename, paramstokeep)
 %   Modified 20120714 BH, include expr_name in metadata for both LSRII and
 %       Stratedigm, update well_id extraction for LSRII. Still need to work
 %       on tube data for both machine
+%   Modified 20120906 JW does parameter translations for LSRII as well.
 
 % read data
 [data,paramVals,textHeader] = fcsread(filename);
 
 % which instrument?
 cytometer = textHeader{find(strcmp('$CYT',{textHeader{:,1}})),2};
+if strcmpi(cytometer,'1400-8')
+    translatefunc = @pstrat;
+elseif strcmpi(cytometer,'LSRII')
+    translatefunc = @plsrii;
+end
 
 % process data for each parameter (i.e. fluorescence channel)
 % works on both stratedigm and lsrii except where noted
@@ -31,12 +37,12 @@ if ischar(paramstokeep)
             datastruct.(parname) = data(:,c);
         end
     elseif strcmp(paramstokeep,'common')    
-        % grab only common channels and rename them (STRATEDIGM ONLY)
-        datastruct = grab_specific_params(data, pnamelist, pstrat([],0));
+        % grab only common channels and rename them
+        datastruct = grab_specific_params(data, pnamelist, translatefunc([],0));
         
     elseif strcmp(paramstokeep,'rename')
-        % grab all channels but rename common ones (STRATEDIGM ONLY)
-        nameconversions = pstrat([],1); % param names -> nicknames
+        % grab all channels but rename common ones
+        nameconversions = translatefunc([],1); % param names -> nicknames
         for c=1:length(pnamelist)
             parname = underscorify(pnamelist{c});
 

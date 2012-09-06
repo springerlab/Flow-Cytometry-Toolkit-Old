@@ -63,7 +63,7 @@ for c=1:length(fns)
     end
 end
 
-disp('Reformatting data into struct array.')
+% disp('Reformatting data into struct array.')
 names = fieldnames(allplates);
 newplates = struct;
 
