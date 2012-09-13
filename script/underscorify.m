@@ -10,8 +10,9 @@ function outstr = underscorify(str,leadingnum)
 %
 %   Created 20120712 JW
 %   Updated 20120814 to condense multiple _'s to a single _.
-outstr = str;
-outstr(~isstrprop(str,'alphanum')) = '_';
+%   Updated 20120912 to trim leading whitespace
+outstr = strtrim(str);
+outstr(~isstrprop(outstr,'alphanum')) = '_';
 
 [idx1 idx2] = regexp(outstr, '_+');
 toremove = [];

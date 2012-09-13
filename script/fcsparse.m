@@ -54,7 +54,6 @@ if ischar(paramstokeep)
             datastruct.(parname) = data(:,c);
         end
     end
-    
 elseif isstruct(paramstokeep)
     % grab only wanted parameters and rename them
     datastruct = grab_specific_params(data, pnamelist, paramstokeep);
