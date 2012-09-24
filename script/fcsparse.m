@@ -7,6 +7,7 @@ function [datastruct metadata]= fcsparse(filename, paramstokeep)
 %       Stratedigm, update well_id extraction for LSRII. Still need to work
 %       on tube data for both machine
 %   Modified 20120906 JW does parameter translations for LSRII as well.
+%   Updated  20120914 BH solve LSRII plate_name bug
 
 % read data
 [data,paramVals,textHeader] = fcsread(filename);
@@ -74,7 +75,7 @@ metadata.begin_time = datenum([Date, ' ', BTim_tmp{1}{1}]);
 
 if strcmp(cytometer,'LSRII')
     % LSRII-specific metadata
-    metadata.plate_name = find(strcmp('PLATE NAME',{textHeader{:,1}}));
+    metadata.plate_name = textHeader{find(strcmp('PLATE NAME',{textHeader{:,1}})),2};
 
 %     % this works but isn't useful
 %     plate_id_idx = find(strcmp('PLATE ID',{textHeader{:,1}}));

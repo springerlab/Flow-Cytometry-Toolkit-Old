@@ -4,10 +4,13 @@ function allplates = fcsreadplates(datadir, varargin)
 %
 %   Created 20120807
 %   Updated 20120821
-% 
+%
 %   Updated 20120909: renamed from fcsreadplateseries to fcsreadplates. Now
 %   reads plate data in subfolders (LSRII) as well as all fcs files in a
 %   single folder (Stratedigm)
+%   Updated 20120914: platename info is updated to be extracted from met
+%   data, instead of file name
+%   Updated 20120920: update platename to be foldername + plate_id(from met)
 tic
 
 p = inputParser;
@@ -31,55 +34,56 @@ allplates = struct;
 % look for fcs files
 % sorting by date helps load plates one at a time
 fns = dir([datadir '*.fcs']);
-[~, idx] = sort([fns.datenum]); 
+[~, idx] = sort([fns.datenum]);
 fns = {fns(idx).name};
 
 if ~isempty(fns)
     disp('Found fcs files. Loading...');
     for c=1:length(fns)
         fn = [datadir fns{c}];
-
+        
         % give current plate a name
         platename = '';
-        if ~isempty(platenameregexp)
-            % give plate name by regular expression match on filename
-            [match,tokens] = regexp(fn, platenameregexp,'match','tokens');
-            if ~isempty(tokens) && ~isempty(tokens{1})
-                platename = underscorify(tokens{1}{1});
-            elseif ~isempty(match)
-                platename = underscorify(match{1});
-            end
-        end
-
+        %         if ~isempty(platenameregexp)
+        %             % give plate name by regular expression match on filename
+        %             [match,tokens] = regexp(fn, platenameregexp,'match','tokens');
+        %             if ~isempty(tokens) && ~isempty(tokens{1})
+        %                 platename = underscorify(tokens{1}{1});
+        %             elseif ~isempty(match)
+        %                 platename = underscorify(match{1});
+        %             end
+        %         end
+        
         % read data
-        if ~isempty(platename) || keepunmatched
-            [dat met] = fcsparse(fn,keepparams);
-    %         disp(fn);
-
-            % if necessary, use filename as plate name
-            if isempty(platename)
-                platename = underscorify(fns{c}(1:end-4));
-            end
-
-            if ~isfield(allplates,platename)
-                disp(['Loading ' platename])
-                allplates.(platename) = struct;
-            end
-
-            if isfield(met,'row')
-                % plate mode data
-                if ~isfield(allplates.(platename), 'data')
-                    allplates.(platename).data = cell(8,12);
-                    allplates.(platename).meta = cell(8,12);
-                end
-                allplates.(platename).data{met.row,met.col} = dat;
-                allplates.(platename).meta{met.row,met.col} = met;
-            else
-                % tube mode data
-                allplates.(platename).data = dat;
-                allplates.(platename).meta = met;
-            end 
+        %         if ~isempty(platename) || keepunmatched
+        [dat met] = fcsparse(fn,keepparams);
+        %         disp(fn);
+        
+        % if necessary, use filename as plate name
+        if isempty(platename)
+            % platename = underscorify(fns{c}(1:end-4));
+            platename = met.plate_name;
         end
+        
+        if ~isfield(allplates,platename)
+            disp(['Loading ' platename])
+            allplates.(platename) = struct;
+        end
+        
+        if isfield(met,'row')
+            % plate mode data
+            if ~isfield(allplates.(platename), 'data')
+                allplates.(platename).data = cell(8,12);
+                allplates.(platename).meta = cell(8,12);
+            end
+            allplates.(platename).data{met.row,met.col} = dat;
+            allplates.(platename).meta{met.row,met.col} = met;
+        else
+            % tube mode data
+            allplates.(platename).data = dat;
+            allplates.(platename).meta = met;
+        end
+        %         end
     end
 end
 
@@ -96,22 +100,23 @@ if isempty(fns) || loadsubfolders
         
         fns = dir([folder '*.fcs']);
         fns = {fns.name};
-
-        % use foldername as plate name
-        platename = folders{c};
         
         % read data
         for j=1:length(fns)
             fn = [datadir folder fns{j}];
             
-%             disp(fn);        
+            %             disp(fn);
             [dat met] = fcsparse(fn,keepparams);
-    
+            
+            % use foldername as plate name
+            platename = folders{c};
+            platename = [platename, met.plate_name];
+            
             if ~isfield(allplates,platename)
                 disp(['Loading ' platename])
                 allplates.(platename) = struct;
             end
-
+            
             if isfield(met,'row')
                 % plate mode data
                 if ~isfield(allplates.(platename), 'data')
@@ -126,7 +131,7 @@ if isempty(fns) || loadsubfolders
                 platename = underscorify(fns{c}(1:end-4));
                 allplates.(platename).data = dat;
                 allplates.(platename).meta = met;
-            end 
+            end
         end
     end
 end
@@ -135,17 +140,17 @@ if strcmpi(output,'array')
     disp('Formatting data into struct array.');
     names = fieldnames(allplates);
     newplates = struct;
-
+    
     for c=1:length(names)
         allplates.(names{c}).platename = names{c};
-
+        
         if c==1
             newplates = allplates.(names{c});
         else
             newplates(c) = allplates.(names{c});
         end
     end
-
+    
     allplates = newplates;
 end
 

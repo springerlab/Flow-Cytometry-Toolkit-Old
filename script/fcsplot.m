@@ -31,10 +31,15 @@ end
 
 % data extract
 data_x = scafunc(data.(channel{1}));
-data_y = scafunc(data.(channel{2}));
+
+if length(channel)>1
+    data_y = scafunc(data.(channel{2}));
+end
 
 % plot
-if length(channel) == 2
+if length(channel) == 1
+    hist(data_x, round(length(data_x)^0.7))
+elseif length(channel) == 2
     plot(data_x, data_y, '.', 'markersize', 1);
 else
     data_z = scafunc(data.(channel{3}));
@@ -43,7 +48,9 @@ end
 
 if xylabel
     xlabel([channel{1}, '\_', scaling], 'fontsize', Fontsize_cal)
-    ylabel([channel{2}, '\_', scaling], 'fontsize', Fontsize_cal)
+    if length(channel) > 1
+        ylabel([channel{2}, '\_', scaling], 'fontsize', Fontsize_cal)
+    end
 end
 
 if length(channel) == 3

@@ -169,8 +169,11 @@ html
 *.mat
 script/scratch
 html
+
 # Added by Bo
 data_b050
 results
 result
 *.pptx
+boSketch.m
+script/master_*.m
