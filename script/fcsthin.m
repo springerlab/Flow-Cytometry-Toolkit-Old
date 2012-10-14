@@ -7,7 +7,8 @@ function thindata = fc_thin(data,num)
 %   events, if NUM >= 1, or a fraction of the events in DATA, if NUM < 1.
 %
 %   Created 2012/7/13 by JW
-%   Modified 20120714 BH
+%   Modified 20120714 BH, redefine num
+%   Modified 20120928 BH, num = floor(num*n); => num = ceil(num*n);
 
 if exist('num')~=1
     % default
@@ -19,7 +20,7 @@ n = length(data.(fns{1})); % size
 
 if num <= 1
     % pull out a fraction of the data (approx)
-    num = floor(num*n);
+    num = ceil(num*n);
     %     k = 10./num;
     %     idx = 1:k:n;
 end

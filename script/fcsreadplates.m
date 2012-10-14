@@ -11,6 +11,10 @@ function allplates = fcsreadplates(datadir, varargin)
 %   Updated 20120914: platename info is updated to be extracted from met
 %   data, instead of file name
 %   Updated 20120920: update platename to be foldername + plate_id(from met)
+%   Updated 20121003: update platename as field name by underscorify(platename)
+%   Updated 20121012: solved for LSRII, export as fcs format, plate name
+%   problem
+
 tic
 
 p = inputParser;
@@ -110,7 +114,12 @@ if isempty(fns) || loadsubfolders
             
             % use foldername as plate name
             platename = folders{c};
-            platename = [platename, met.plate_name];
+            
+            if isfield(met, 'plate_name')
+                platename = underscorify(met.plate_name, 1);
+            end
+%             platename = underscorify([platename, met.plate_name]);
+%             platename = ['x', platename];
             
             if ~isfield(allplates,platename)
                 disp(['Loading ' platename])
